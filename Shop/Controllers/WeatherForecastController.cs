@@ -26,6 +26,7 @@ namespace Shop.Controllers
         [HttpGet]
         public IEnumerable<WeatherForecast> Get()
         {
+            var t = User.Identity.Name;
             var rng = new Random();
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
