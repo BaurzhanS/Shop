@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Shop.Helpers;
+using Shop.Interfaces;
 using Shop.Models;
 using System;
 using System.Collections.Generic;
@@ -12,23 +13,19 @@ using System.Threading.Tasks;
 
 namespace Shop.Services
 {
-    public class UserService
+    public class UserService: IUserService
     {
-        public UserService(IOptions<AppSettings> appSettings)
+        private readonly AppSettings _appSettings;
+        private IUserRepository repo;
+        public UserService(IUserRepository repository, IOptions<AppSettings> appSettings)
         {
             _appSettings = appSettings.Value;
+            repo = repository;
         }
-
-        private readonly AppSettings _appSettings;
-
-        private List<User> _users = new List<User>
+        public async Task<User> Authenticate(string username, string password)
         {
-            new User { Id = 1, FirstName = "Admin", LastName = "User", Username = "admin", Password = "admin", Role = Role.Admin },
-            new User { Id = 2, FirstName = "Normal", LastName = "User", Username = "user", Password = "user", Role = Role.User }
-        };
-        public User Authenticate(string username, string password)
-        {
-            var user = _users.SingleOrDefault(x => x.Username == username && x.Password == password);
+            var users = await repo.GetAllUsers();
+            var user = users.FirstOrDefault(x => x.Username == username && x.Password == password);
 
             if (user == null)
                 return null;
@@ -40,7 +37,7 @@ namespace Shop.Services
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                     new Claim(ClaimTypes.Name, user.Id.ToString()),
-                    new Claim(ClaimTypes.Role, user.Role)
+                    new Claim(ClaimTypes.Role, user.RoleName)
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -51,11 +48,17 @@ namespace Shop.Services
 
             return user;
         }
-
-
-        public List<User> GetAllUsers()
+        public async Task<IEnumerable<User>> GetUsers(int pageNumber, int pageSize)
         {
-            return _users;
+            if (pageNumber == 0)
+            {
+                pageNumber = 1;
+            }
+            return await repo.GetUsers(pageNumber, pageSize);
+        }
+        public async Task<User> GetUser(int Id)
+        {
+            return await repo.GetUser(Id);
         }
     }
 }

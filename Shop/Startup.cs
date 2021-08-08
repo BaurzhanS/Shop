@@ -8,6 +8,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Shop.Helpers;
+using Shop.Interfaces;
+using Shop.Models;
+using Shop.Repository;
 using Shop.Services;
 using System;
 using System.Collections.Generic;
@@ -30,8 +33,9 @@ namespace Shop
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCors();
+            services.AddSingleton<DapperContext>();
             services.AddControllers();
-
+            
             var appSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);
 
@@ -53,8 +57,12 @@ namespace Shop
                     ValidateAudience = false
                 };
             });
-
-            services.AddScoped<UserService, UserService>();
+            services.AddScoped<IOrderRepository, OrderRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IRegionRepository, RegionRepository>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IOrderService, OrderService>();
+            services.AddScoped<IRegionService, RegionService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

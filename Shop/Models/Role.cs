@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace Shop.Models
 {
-    public static class Role
+    public class Role
     {
-        public const string Admin = "Admin";
-        public const string User = "User";
+        public int RoleId { get; set; }
+        public string RoleName { get; set; }
     }
 }

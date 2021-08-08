@@ -12,7 +12,8 @@ namespace Shop.Models
         public string LastName { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
-        public string Role { get; set; }
+        public int RoleId { get; set; }
+        public string RoleName { get; set; }
         public string Token { get; set; }
     }
 }
