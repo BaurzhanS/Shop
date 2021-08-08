@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Shop.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
@@ -46,6 +46,13 @@ namespace Shop.Controllers
             }
         }
 
+        /// <summary>
+        /// Чтобы получить эксель файл нужно закомментить [Authorize(Roles = "admin")] и зайти в метод через браузер
+        /// </summary>
+        /// <param name="pageNumber"></param>
+        /// <param name="pageSize"></param>
+        /// <returns></returns>
+        [Authorize(Roles = "admin")]
         [HttpGet("users")]
         public async Task<IActionResult> GetAllUsers(int pageNumber, int pageSize = 4)
         {
