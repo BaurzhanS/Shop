@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Shop.Helpers;
 using Shop.Interfaces;
@@ -11,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace Shop.Controllers
 {
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class OrderController : ControllerBase
@@ -21,22 +23,29 @@ namespace Shop.Controllers
         {
             _orderService = orderService;
         }
-        //[Authorize(Roles = Role.Admin)]
+
+        /// <summary>
+        /// Чтобы получить эксель файл нужно закомментить [Authorize(Roles = "admin")] и зайти в метод через браузер
+        /// </summary>
+        /// <param name="pageNumber"></param>
+        /// <param name="pageSize"></param>
+        /// <returns></returns>
+        //[Authorize(Roles = "admin")]
         [HttpGet("orders")]
         public async Task<IActionResult> GetAllOrders(int pageNumber, int pageSize = 4)
         {
             try
             {
                 var orders = await _orderService.GetOrders(pageNumber, pageSize);
-                var contentBytes = ExcelHepler<Order>.ExportToExcel(orders);
-                if (contentBytes != null)
-                {
-                    Response.Clear();
-                    Response.Headers.Add("content-disposition", "attachment;filename=Orders.xls");
-                    Response.ContentType = "application/xls";
-                    await Response.Body.WriteAsync(contentBytes);
-                    Response.Body.Flush();
-                }
+                //var contentBytes = ExcelHepler<Order>.ExportToExcel(orders);
+                //if (contentBytes != null)
+                //{
+                //    Response.Clear();
+                //    Response.Headers.Add("content-disposition", "attachment;filename=Orders.xls");
+                //    Response.ContentType = "application/xls";
+                //    await Response.Body.WriteAsync(contentBytes);
+                //    Response.Body.Flush();
+                //}
                 
                 return Ok(orders);
             }
@@ -46,6 +55,7 @@ namespace Shop.Controllers
             }
         }
 
+        [Authorize(Roles = "user")]
         [HttpGet("order/{id}")]
         public async Task<IActionResult> GetOrder(int id)
         {
@@ -61,6 +71,7 @@ namespace Shop.Controllers
 
         }
 
+        [Authorize(Roles = "user")]
         [HttpPost("createOrder")]
         public async Task<IActionResult> CreateOrder(Order order)
         {
@@ -79,6 +90,8 @@ namespace Shop.Controllers
             }
 
         }
+
+        [Authorize(Roles = "admin")]
         [HttpPost("updateOrder/{id}")]
         public async Task<IActionResult> UpdateOrder(int id, Order order)
         {
@@ -102,6 +115,7 @@ namespace Shop.Controllers
             }
         }
 
+        [Authorize(Roles = "admin")]
         [HttpGet("deleteOrder/{id}")]
         public async Task<IActionResult> DeleteOrder(int id)
         {

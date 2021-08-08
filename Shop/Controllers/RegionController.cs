@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Shop.Helpers;
 using Shop.Interfaces;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace Shop.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class RegionController : ControllerBase
@@ -20,7 +22,15 @@ namespace Shop.Controllers
         {
             _regionService = regionService;
         }
-        //[Authorize(Roles = Role.Admin)]
+
+        /// <summary>
+        /// Чтобы получить эксель файл нужно закомментить [Authorize(Roles = "user")] и зайти в метод через браузер
+        /// </summary>
+        /// <param name="parentId"></param>
+        /// <param name="pageNumber"></param>
+        /// <param name="pageSize"></param>
+        /// <returns></returns>
+        [Authorize(Roles = "user")]
         [HttpGet("regions/{parentId}")]
         public async Task<IActionResult> GetRegionsByParentId(int parentId, int pageNumber, int pageSize = 10)
         {

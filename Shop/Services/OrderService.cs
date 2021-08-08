@@ -43,6 +43,8 @@ namespace Shop.Services
         public async Task DeleteOrder(int orderId)
         {
             await repo.DeleteOrder(orderId);
+
+            Nova.Samples.Client.Investigations.Models.InvestigationAddTestsModel m = new Nova.Samples.Client.Investigations.Models.InvestigationAddTestsModel();
         }
     }
 }
